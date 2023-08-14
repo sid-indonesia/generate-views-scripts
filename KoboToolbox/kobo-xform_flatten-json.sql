@@ -1,11 +1,11 @@
 -- Generalized solution (for jsonb) https://stackoverflow.com/a/35179515
 -- Create function "Create Kobo flattened logger instace view"
 CREATE
-OR REPLACE FUNCTION generated_views.create_logger_instance_json_flat_view (
+OR REPLACE FUNCTION generated_views.create_json_flat_view (
     table_name TEXT,
     regular_columns TEXT,
     json_column TEXT,
-    xform_id INT4,
+    identifier_value INT4,
     identifier_column TEXT
 ) RETURNS TEXT LANGUAGE plpgsql AS $$ DECLARE cols TEXT;
 
@@ -34,7 +34,7 @@ BEGIN EXECUTE format (
 $ex$,
 table_name,
 json_column,
-xform_id,
+identifier_value,
 identifier_column
 ) INTO cols;
 
@@ -53,7 +53,7 @@ WHERE
     regular_columns,
     cols,
     json_column,
-    xform_id,
+    identifier_value,
     identifier_column
 );
 
@@ -72,15 +72,15 @@ BEGIN EXECUTE format (
     SELECT
         string_agg(
             format(
-                'generated_views.create_logger_instance_json_flat_view(''public.logger_instance'',''id, xml, date_created, date_modified, deleted_at, status, uuid, geom, survey_type_id, user_id, xform_id, xml_hash, is_synced_with_mongo, posted_to_kpi'',''json'',%%1$L,''xform_id'')',
-                "xform_id"
+                'generated_views.create_json_flat_view(''public.logger_instance'',''id, xml, date_created, date_modified, deleted_at, status, uuid, geom, survey_type_id, user_id, xform_id, xml_hash, is_synced_with_mongo, posted_to_kpi'',''json'',%%1$L,''xform_id'')',
+                "identifier_value"
             ),
             ', '
         )
     FROM
         (
             SELECT
-                DISTINCT li.xform_id AS "xform_id"
+                DISTINCT li.xform_id AS "identifier_value"
             FROM
                 public."logger_instance" li
             ORDER BY
