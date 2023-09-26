@@ -26,8 +26,6 @@ BEGIN EXECUTE format (
                         jsonb_each(%2$s :: jsonb)
                     WHERE
                         li.%4$s = %3$L
-                    ORDER BY
-                        1
                 ) s
         ) t;
 
