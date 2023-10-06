@@ -1,6 +1,6 @@
 CREATE SCHEMA IF NOT EXISTS generated_views;
 -- Generalized solution (for jsonb) https://stackoverflow.com/a/35179515
--- Create function "Create HAPI FHIR `hfj_res_ver` grouped by `res_type` and `res_text_vc` type changed to `jsonb` view"
+-- Create function "Create HAPI FHIR 'hfj_res_ver' grouped by 'res_type' and 'res_text_vc' type changed to 'jsonb' view"
 CREATE OR REPLACE FUNCTION generated_views.create_json_view (
         table_name TEXT,
         regular_columns TEXT,
