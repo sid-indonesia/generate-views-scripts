@@ -11,7 +11,7 @@ CREATE OR REPLACE FUNCTION generated_views.create_json_view (
         $ex$ DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
 CREATE VIEW generated_views."%4$s_all_versions_view" AS
 SELECT %2$s,
-    %3$s::jsonb
+    %3$s::jsonb AS "%4$s"
 FROM %1$s e
 WHERE e.%5$s = %4$L $ex$,
     table_name,
