@@ -8,6 +8,8 @@ CREATE OR REPLACE FUNCTION generated_views.create_json_flat_view (
     identifier_value TEXT,
     identifier_column TEXT
   ) RETURNS TEXT LANGUAGE plpgsql AS $$DECLARE cols TEXT;
+array_cols TEXT;
+merged_cols TEXT;
 BEGIN execute format (
   $ex$
   select string_agg(
@@ -19,11 +21,30 @@ BEGIN execute format (
       from generated_views."All_resources_all_versions_view" aravv,
         jsonb_each(data)
       WHERE aravv.data->>'resourceType' = %1$L
+        AND jsonb_typeof(value) != 'array'
       order by 1
     ) s;
 $ex$,
 identifier_value
 ) into cols;
+execute format (
+  $ex$
+  select string_agg(
+      format('aravv.data->%%1$L "%1$s.%%1$s"', key),
+      ', '
+    )
+  from (
+      select distinct key
+      from generated_views."All_resources_all_versions_view" aravv,
+        jsonb_each(data)
+      WHERE aravv.data->>'resourceType' = %1$L
+        AND jsonb_typeof(value) = 'array'
+      order by 1
+    ) s;
+$ex$,
+identifier_value
+) into array_cols;
+SELECT concat_ws(', ', cols, array_cols) INTO merged_cols;
 EXECUTE format(
   $ex$ DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
 CREATE VIEW generated_views."%4$s_all_versions_view" AS
@@ -38,7 +59,7 @@ WHERE hrv.%5$s = %4$L $ex$,
   json_column,
   identifier_value,
   identifier_column,
-  cols
+  merged_cols
 );
 RETURN 1;
 END $$;
