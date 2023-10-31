@@ -28,7 +28,6 @@ EXECUTE format(
   $ex$ DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
 CREATE VIEW generated_views."%4$s_all_versions_view" AS
 SELECT %2$s,
-  -- %3$s::jsonb AS "%4$s"
   %6$s
 FROM %1$s hrv
   RIGHT JOIN generated_views."All_resources_all_versions_view" aravv ON hrv.pid = aravv.pid
