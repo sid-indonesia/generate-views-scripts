@@ -29,7 +29,7 @@ EXECUTE format(
 CREATE VIEW generated_views."%4$s_all_versions_view" AS
 SELECT %2$s,
   %6$s,
-  CONCAT(%4$L, hrv.res_id) AS "%4$s.referenceString"
+  CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
 FROM %1$s hrv
   RIGHT JOIN generated_views."All_resources_all_versions_view" aravv ON hrv.pid = aravv.pid
 WHERE hrv.%5$s = %4$L $ex$,
