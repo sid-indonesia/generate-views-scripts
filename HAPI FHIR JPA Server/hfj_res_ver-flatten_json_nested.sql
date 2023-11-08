@@ -9,8 +9,8 @@ CREATE OR REPLACE FUNCTION generated_views.create_json_flat_view (
     identifier_column TEXT
   ) RETURNS TEXT LANGUAGE plpgsql AS $$DECLARE cols TEXT;
 BEGIN EXECUTE format(
-  $ex$ DROP VIEW IF EXISTS generated_views."z_flattened_%4$s_all_versions_view";
-CREATE VIEW generated_views."z_flattened_%4$s_all_versions_view" AS with recursive flat (pid, key, value) as (
+  $ex$ DROP VIEW IF EXISTS generated_views."z_flattened_%3$s_all_versions_view";
+CREATE VIEW generated_views."z_flattened_%3$s_all_versions_view" AS with recursive flat (pid, key, value) as (
   select pid,
     key,
     value
