@@ -15,7 +15,7 @@ CREATE VIEW generated_views."z_flattened_%4$s_all_versions_view" AS with recursi
     key,
     value
   from %1$s hrv,
-    jsonb_each("%2$S"::jsonb)
+    jsonb_each("%2$s"::jsonb)
   where hrv.%4$s = %3$L
   union
   select f.pid,
