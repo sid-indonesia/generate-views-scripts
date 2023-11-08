@@ -45,7 +45,7 @@ execute format (
   from (
       select distinct key
       from generated_views."z_flattened_%1$s_all_versions_view" aravv,
-        jsonb_each("$1$s") -- WHERE aravv."%4$s"->>'resourceType' = %1$L
+        jsonb_each("%1$s") -- WHERE aravv."%4$s"->>'resourceType' = %1$L
       order by 1
     ) s;
 $ex$,
