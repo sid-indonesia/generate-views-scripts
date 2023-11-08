@@ -76,27 +76,7 @@ END $$;
 CREATE OR REPLACE FUNCTION generated_views.generate_all_fhir_resources_views() RETURNS TEXT LANGUAGE plpgsql AS $$
 DECLARE the_queries TEXT;
 BEGIN EXECUTE format (
-  $ex$ -- CREATE OR REPLACE VIEW generated_views."All_resources_all_versions_view" AS --
-  -- -- https://stackoverflow.com/a/45592457
-  --     with recursive flat (pid, key, value) as (
-  --       select pid,
-  --         key,
-  --         value
-  --       from public.hfj_res_ver hrv,
-  --         jsonb_each(res_text_vc::jsonb)
-  --       union
-  --       select f.pid,
-  --         concat(f.key, '.', j.key),
-  --         j.value
-  --       from flat f,
-  --         jsonb_each(f.value) j
-  --       where jsonb_typeof(f.value) = 'object'
-  --     )
-  --   select pid,
-  --     jsonb_object_agg(key, value) as data
-  --   from flat
-  --   where jsonb_typeof(value) <> 'object'
-  --   group by pid;
+  $ex$
   SELECT string_agg(
       format(
         'generated_views.create_json_flat_view(''public.hfj_res_ver'',''hrv.pid, partition_date, partition_id, res_deleted_at, res_version, has_tags, res_published, res_updated, res_encoding, res_text, res_id, res_type, res_ver'',''res_text_vc'',%%1$L,''res_type'')',
