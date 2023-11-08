@@ -37,26 +37,43 @@ identifier_value,
 identifier_column
 );
 execute format (
-  $ex$
-  select string_agg(
-      format('aravv."%1$s"->>%%1$L "%1$s.%%1$s"', key),
-      ', '
-    )
-  from (
-      select distinct key
-      from generated_views."z_flattened_%1$s_all_versions_view" aravv,
-        jsonb_each("%1$s") -- WHERE aravv."%4$s"->>'resourceType' = %1$L
-      order by 1
-    ) s;
-$ex$,
-identifier_value
+  $ex$ WITH keys_cte AS (
+    SELECT DISTINCT key
+    FROM generated_views."z_flattened_%1$s_all_versions_view" aravv,
+      jsonb_each("%1$s") -- WHERE aravv."%4$s"->>'resourceType' = %1$L
+    order by 1
+  )
+  SELECT CASE
+      WHEN EXISTS (
+        SELECT 1
+        FROM keys_cte
+      ) THEN (
+        SELECT ',' || string_agg(
+            format('aravv."%1$s"->>%%1$L "%1$s.%%1$s"', key),
+            ', '
+          )
+        FROM keys_cte
+      )
+      ELSE NULL -- Or any other action you want to take if no results are found
+    END -- select string_agg(
+    --     format('aravv."%1$s"->>%%1$L "%1$s.%%1$s"', key),
+    --     ', '
+    --   )
+    -- from (
+    --     select distinct key
+    --     from generated_views."z_flattened_%1$s_all_versions_view" aravv,
+    --       jsonb_each("%1$s") -- WHERE aravv."%4$s"->>'resourceType' = %1$L
+    --     order by 1
+    --   ) s;
+    $ex$,
+    identifier_value
 ) into cols;
 execute format (
   $ex$ DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
 CREATE VIEW generated_views."%4$s_all_versions_view" AS
 SELECT %2$s,
-  %6$s,
   CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
+  %6$s
 FROM %1$s hrv
   RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
 WHERE hrv.%5$s = %4$L;
