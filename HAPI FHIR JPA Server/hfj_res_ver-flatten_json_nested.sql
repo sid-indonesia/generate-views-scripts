@@ -10,27 +10,27 @@ CREATE OR REPLACE FUNCTION generated_views.create_json_flat_view (
   ) RETURNS TEXT LANGUAGE plpgsql AS $$
 DECLARE cols TEXT;
 BEGIN EXECUTE format(
-  $ex$ DROP VIEW IF EXISTS generated_views."z_flattened_%3$s_all_versions_view";
-CREATE VIEW generated_views."z_flattened_%3$s_all_versions_view" AS with recursive flat (pid, key, value) as (
+  $ex$
+  CREATE OR REPLACE VIEW generated_views."z_flattened_%3$s_all_versions_view" AS with recursive flat (pid, key, value) as (
+      select pid,
+        key,
+        value
+      from %1$s hrv,
+        jsonb_each("%2$s"::jsonb)
+      where hrv."%4$s" = %3$L
+      union
+      select f.pid,
+        concat(f.key, '.', j.key),
+        j.value
+      from flat f,
+        jsonb_each(f.value) j
+      where jsonb_typeof(f.value) = 'object'
+    )
   select pid,
-    key,
-    value
-  from %1$s hrv,
-    jsonb_each("%2$s"::jsonb)
-  where hrv."%4$s" = %3$L
-  union
-  select f.pid,
-    concat(f.key, '.', j.key),
-    j.value
-  from flat f,
-    jsonb_each(f.value) j
-  where jsonb_typeof(f.value) = 'object'
-)
-select pid,
-  jsonb_object_agg(key, value) as "%3$s"
-from flat
-where jsonb_typeof(value) <> 'object'
-group by pid;
+    jsonb_object_agg(key, value) as "%3$s"
+  from flat
+  where jsonb_typeof(value) <> 'object'
+  group by pid;
 $ex$,
 table_name,
 json_column,
@@ -53,14 +53,14 @@ $ex$,
 identifier_value
 ) into cols;
 execute format (
-  $ex$ DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
-CREATE VIEW generated_views."%4$s_all_versions_view" AS
-SELECT %2$s,
-  %6$s,
-  CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
-FROM %1$s hrv
-  RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
-WHERE hrv.%5$s = %4$L;
+  $ex$
+  CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
+  SELECT %2$s,
+    %6$s,
+    CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
+  FROM %1$s hrv
+    RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
+  WHERE hrv.%5$s = %4$L;
 $ex$,
 table_name,
 regular_columns,
