@@ -16,7 +16,7 @@ CREATE VIEW generated_views."z_flattened_%3$s_all_versions_view" AS with recursi
     value
   from %1$s hrv,
     jsonb_each("%2$s"::jsonb)
-  where hrv.%4$s = %3$L
+  where hrv."%4$s" = %3$L
   union
   select f.pid,
     concat(f.key, '.', j.key),
@@ -59,13 +59,14 @@ SELECT %2$s,
   CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
 FROM %1$s hrv
   RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
-WHERE hrv.%5$s = %4$L $ex$,
-  table_name,
-  regular_columns,
-  json_column,
-  identifier_value,
-  identifier_column,
-  cols
+WHERE hrv.%5$s = %4$L;
+$ex$,
+table_name,
+regular_columns,
+json_column,
+identifier_value,
+identifier_column,
+cols
 );
 RETURN 1;
 END $$;
