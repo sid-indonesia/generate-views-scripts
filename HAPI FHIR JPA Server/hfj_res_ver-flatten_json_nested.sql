@@ -54,7 +54,8 @@ identifier_value
 ) into cols;
 execute format (
   $ex$
-  CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
+  DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
+  CREATE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
     %6$s,
     CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
