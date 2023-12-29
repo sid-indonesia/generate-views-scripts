@@ -75,7 +75,7 @@ execute format (
                 hfj_forced_id hfi
             WHERE
                 hfi."resource_pid" = hrv."res_id")
-        ELSE hrv.res_id
+        ELSE hrv.res_id::text
       END
     ) AS "%4$s.referenceString"
   FROM %1$s hrv
