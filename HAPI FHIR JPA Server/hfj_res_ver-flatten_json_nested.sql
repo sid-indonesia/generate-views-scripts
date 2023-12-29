@@ -54,10 +54,9 @@ identifier_value
 ) into cols;
 execute format (
   $ex$
-  -- DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view";
+  -- DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
   CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
-    %6$s,
     CONCAT(%4$L, '/', 
       CASE
         WHEN (
@@ -65,19 +64,20 @@ execute format (
             SELECT
                 1
             FROM
-                hfj_forced_id hfi
+                public.hfj_forced_id hfi
             WHERE
                 hfi."resource_pid" = hrv."res_id")
         )
         THEN (SELECT
                 hfi."forced_id"
             FROM
-                hfj_forced_id hfi
+                public.hfj_forced_id hfi
             WHERE
                 hfi."resource_pid" = hrv."res_id")
         ELSE hrv.res_id::text
       END
-    ) AS "%4$s.referenceString"
+    ) AS "%4$s.referenceString",
+    %6$s
   FROM %1$s hrv
     RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
   WHERE hrv.%5$s = %4$L;
