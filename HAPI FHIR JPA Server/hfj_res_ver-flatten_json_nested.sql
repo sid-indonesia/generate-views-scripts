@@ -68,6 +68,7 @@ execute format (
                 hfj_forced_id hfi
             WHERE
                 hfi."resource_pid" = hrv."res_id")
+        )
         THEN (SELECT
                 hfi."forced_id"
             FROM
