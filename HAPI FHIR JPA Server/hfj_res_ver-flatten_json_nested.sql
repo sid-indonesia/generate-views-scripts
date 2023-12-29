@@ -58,7 +58,25 @@ execute format (
   CREATE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
     %6$s,
-    CONCAT(%4$L, '/', hrv.res_id) AS "%4$s.referenceString"
+    CONCAT(%4$L, '/', 
+      CASE
+        WHEN (
+          EXISTS (
+            SELECT
+                1
+            FROM
+                hfj_forced_id hfi
+            WHERE
+                hfi."resource_pid" = hrv."res_id")
+        THEN (SELECT
+                hfi."forced_id"
+            FROM
+                hfj_forced_id hfi
+            WHERE
+                hfi."resource_pid" = hrv."res_id")
+        ELSE hrv.res_id
+      END
+    ) AS "%4$s.referenceString"
   FROM %1$s hrv
     RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
   WHERE hrv.%5$s = %4$L;
