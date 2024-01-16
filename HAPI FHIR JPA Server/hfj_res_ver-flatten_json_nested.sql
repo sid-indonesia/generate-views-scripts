@@ -47,7 +47,6 @@ EXECUTE format (
       select distinct key
       from generated_views."z_flattened_%1$s_all_versions_view" aravv,
         jsonb_each("%1$s")
-      order by 1
     ) s;
 $ex$,
 identifier_value
