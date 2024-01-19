@@ -26,8 +26,8 @@ begin
         $ex$, table_name, json_column)
     into cols;
     execute format($ex$
-        drop view if exists core.%1$s_view;
-        create view core.%1$s_view as 
+        -- drop view if exists core.%1$s_view;
+        create or replace view core.%1$s_view as 
         select %2$s, %3$s from core.%1$s a
         $ex$, table_name, regular_columns, cols);
     return cols;
@@ -75,8 +75,8 @@ begin
     into flat_obs_cols;
     IF flat_obs_cols IS NULL THEN
         execute format($ex$
-            drop view if exists core."%1$s_%5$s_view";
-            create view core."%1$s_%5$s_view" as 
+            -- drop view if exists core."%1$s_%5$s_view";
+            create or replace view core."%1$s_%5$s_view" as 
             select %2$s, %3$s from core.%1$s e
             WHERE e.%4$s ->> 'eventType' = %5$L
             $ex$, table_name, regular_columns, cols, json_column, event_type);
@@ -86,8 +86,8 @@ begin
         $ex$, cols, json_column)
         INTO cols;
         execute format($ex$
-            drop view if exists core."%1$s_%5$s_view";
-            create view core."%1$s_%5$s_view" as 
+            -- drop view if exists core."%1$s_%5$s_view";
+            create or replace view core."%1$s_%5$s_view" as 
             select %2$s, %3$s, %6$s from core.%1$s e
             LEFT JOIN (SELECT
                 e2.id,

@@ -86,8 +86,8 @@ begin
         $ex$)
     into open_test_tasks_flat_array_cols;
     execute format($ex$
-        drop view if exists core."event_Contact Visit detailed_view";
-        create view core."event_Contact Visit detailed_view" as 
+        -- drop view if exists core."event_Contact Visit detailed_view";
+        create or replace view core."event_Contact Visit detailed_view" as 
         select e.id, date_deleted, server_version,
             %1$s,  
             details."Contact",

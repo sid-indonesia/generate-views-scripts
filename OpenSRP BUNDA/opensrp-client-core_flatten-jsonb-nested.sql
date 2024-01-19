@@ -39,8 +39,8 @@ begin
     SELECT concat_ws(', ', cols, nested_cols)
     INTO final_selected_cols;
     execute format($ex$
-        drop view if exists core.%1$s_detailed_view;
-        create view core.%1$s_detailed_view as 
+        -- drop view if exists core.%1$s_detailed_view;
+        create or replace view core.%1$s_detailed_view as 
         select %2$s, %3$s from core.%1$s a
         $ex$, table_name, regular_columns, final_selected_cols);
     return final_selected_cols;
