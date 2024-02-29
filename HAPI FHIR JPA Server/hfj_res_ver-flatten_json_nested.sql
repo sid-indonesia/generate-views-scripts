@@ -31,7 +31,8 @@ BEGIN EXECUTE format(
     jsonb_object_agg(key, value) as "%3$s"
   from flat
   where jsonb_typeof(value) <> 'object'
-  group by pid;
+  group by pid
+  order by pid;
 $ex$,
 table_name,
 json_column,
@@ -60,7 +61,7 @@ json_column
 ) into cols;
 execute format (
   $ex$
-  -- DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
+  DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
   CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
     CONCAT(%4$L, '/', 
