@@ -11,6 +11,7 @@ CREATE OR REPLACE FUNCTION generated_views.create_json_flat_view (
 DECLARE cols TEXT;
 BEGIN EXECUTE format(
   $ex$
+  -- DROP VIEW IF EXISTS generated_views."z_flattened_%3$s_all_versions_view" CASCADE;
   CREATE OR REPLACE VIEW generated_views."z_flattened_%3$s_all_versions_view" AS with recursive flat (pid, key, value) as (
       select pid,
         key,
@@ -40,20 +41,26 @@ identifier_column
 EXECUTE format (
   $ex$
   select string_agg(
-      format('aravv."%1$s"->>%%1$L "%1$s.%%1$s"', key),
+      format('hrv."%2$s"::jsonb #>> %%2$L "%1$s.%%1$s"', t.key, t.json_path),
       ', '
     )
   from (
+    SELECT s.key,
+      CONCAT('{', (REPLACE(s.key, '.', ',')), '}' ) AS json_path
+    FROM
+    (
       select distinct key
-      from generated_views."z_flattened_%1$s_all_versions_view" aravv,
+      from generated_views."z_flattened_%1$s_all_versions_view" flattened_nested_json,
         jsonb_each("%1$s")
-    ) s;
+    ) s
+  ) t;
 $ex$,
-identifier_value
+identifier_value,
+json_column
 ) into cols;
 execute format (
   $ex$
-  -- DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
+  DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
   CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
     CONCAT(%4$L, '/', 
@@ -78,7 +85,6 @@ execute format (
     ) AS "%4$s.referenceString",
     %6$s
   FROM %1$s hrv
-    RIGHT JOIN generated_views."z_flattened_%4$s_all_versions_view" aravv ON hrv.pid = aravv.pid
   WHERE hrv.%5$s = %4$L;
 $ex$,
 table_name,
