@@ -53,6 +53,7 @@ EXECUTE format (
       select distinct key
       from generated_views."z_flattened_%1$s_all_versions_view" flattened_nested_json,
         jsonb_each("%1$s")
+      order by 1
     ) s
   ) t;
 $ex$,
@@ -61,7 +62,7 @@ json_column
 ) into cols;
 execute format (
   $ex$
-  -- DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
+  DROP VIEW IF EXISTS generated_views."%4$s_all_versions_view" CASCADE;
   CREATE OR REPLACE VIEW generated_views."%4$s_all_versions_view" AS
   SELECT %2$s,
     CONCAT(%4$L, '/', 
