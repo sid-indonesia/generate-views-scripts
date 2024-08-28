@@ -70,19 +70,44 @@ execute format (
         WHEN (
           EXISTS (
             SELECT
-                1
+              1
             FROM
-                public.hfj_forced_id hfi
+              information_schema.columns
             WHERE
-                hfi."resource_pid" = hrv."res_id")
+              table_name = 'hfj_resource'
+              AND column_name = 'fhir_id'
+          )
         )
-        THEN (SELECT
+        THEN (
+          SELECT
+            hr."fhir_id"
+          FROM
+            public.hfj_resource hr
+          WHERE
+            hr."res_id" = hrv."res_id"
+        )
+        ELSE 
+          CASE
+            WHEN (
+              EXISTS (
+                SELECT
+                  1
+                FROM
+                  public.hfj_forced_id hfi
+                WHERE
+                  hfi."resource_pid" = hrv."res_id"
+              )
+            )
+            THEN (
+              SELECT
                 hfi."forced_id"
-            FROM
+              FROM
                 public.hfj_forced_id hfi
-            WHERE
-                hfi."resource_pid" = hrv."res_id")
-        ELSE hrv.res_id::text
+              WHERE
+                hfi."resource_pid" = hrv."res_id"
+            )
+            ELSE hrv.res_id::text
+          END
       END
     ) AS "%4$s.referenceString",
     %6$s
