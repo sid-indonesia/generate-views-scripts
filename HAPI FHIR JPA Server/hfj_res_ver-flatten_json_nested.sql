@@ -19,7 +19,7 @@ BEGIN EXECUTE format(
       from %1$s hrv,
         jsonb_each("%2$s"::jsonb)
       where hrv."%4$s" = %3$L
-      union
+  union all
       select f.pid,
         concat(f.key, '.', j.key),
         j.value
@@ -106,10 +106,10 @@ BEGIN EXECUTE format (
   $ex$
   SELECT string_agg(
       format(
-        'generated_views.create_json_flat_view(''public.hfj_res_ver'',''hrv.pid, partition_date, partition_id, res_deleted_at, res_version, has_tags, res_published, res_updated, res_encoding, res_text, res_id, res_type, res_ver'',''res_text_vc'',%%1$L,''res_type'')',
+        'SELECT generated_views.create_json_flat_view(''public.hfj_res_ver'',''hrv.pid, partition_date, partition_id, res_deleted_at, res_version, has_tags, res_published, res_updated, res_encoding, res_text, res_id, res_type, res_ver'',''res_text_vc'',%%1$L,''res_type'')',
         "res_type_value"
       ),
-      ', '
+      '; '
     )
   FROM (
       SELECT DISTINCT all_fhir_resources_all_versions.res_type AS "res_type_value"
@@ -121,7 +121,7 @@ $ex$
 ) INTO the_queries;
 EXECUTE format(
   $ex$
-  SELECT %1$s $ex$,
+  %1$s $ex$,
     the_queries
 );
 RETURN the_queries;
