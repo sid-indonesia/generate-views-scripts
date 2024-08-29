@@ -12,11 +12,15 @@ OR REPLACE FUNCTION generated_views.create_json_flat_view (
 BEGIN EXECUTE format (
     $ex$
     SELECT
-        string_agg(format('%2$s :: jsonb ->>%%1$L "%%2s_%%1$s"', KEY, row_number), ', ')
+        string_agg(format('%2$s :: jsonb ->>%%1$L "%%2$s"', KEY, "sanitized_key"), ', ')
     FROM
         (
             SELECT KEY,
-            row_number() OVER (ORDER BY KEY) as row_number
+            CASE
+	            WHEN KEY ILIKE '%%/%%'
+	            THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1))
+	            ELSE KEY
+	        END AS "sanitized_key"
             FROM 
                 (
                     SELECT
@@ -27,6 +31,7 @@ BEGIN EXECUTE format (
                     WHERE
                         li.%4$s = %3$L
                 ) s
+            ORDER BY "sanitized_key"
         ) t;
 
 $ex$,
