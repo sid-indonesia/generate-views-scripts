@@ -70,7 +70,11 @@ BEGIN EXECUTE format (
                                     WHEN (
                                         LENGTH(KEY) > 59
                                     )
-                                    THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) + 9))
+                                    THEN
+                                        CONCAT(
+                                            SUBSTRING(KEY, 1, 9) || '~',
+                                            REVERSE(SUBSTRING(REVERSE(KEY), 1, 49))
+                                        )
                                     ELSE KEY
                                 END
                             ELSE KEY
