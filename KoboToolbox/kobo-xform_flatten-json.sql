@@ -69,7 +69,6 @@ BEGIN EXECUTE format (
                                 CASE
                                     WHEN (
                                         LENGTH(KEY) > 59
-                                        OR KEY ILIKE 'group_%%/%%'
                                     )
                                     THEN CONCAT('grp/', REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1)))
                                     ELSE KEY
