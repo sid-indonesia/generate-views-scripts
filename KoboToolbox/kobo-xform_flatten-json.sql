@@ -19,23 +19,44 @@ BEGIN EXECUTE format (
                 KEY,
                 CASE
                     WHEN (
-                            "shortened_key_dupe_with_non_json" = 'id'
-                            OR "shortened_key_dupe_with_non_json" = 'xml'
-                            OR "shortened_key_dupe_with_non_json" = 'date_created'
-                            OR "shortened_key_dupe_with_non_json" = 'date_modified'
-                            OR "shortened_key_dupe_with_non_json" = 'deleted_at'
-                            OR "shortened_key_dupe_with_non_json" = 'status'
-                            OR "shortened_key_dupe_with_non_json" = 'uuid'
-                            OR "shortened_key_dupe_with_non_json" = 'geom'
-                            OR "shortened_key_dupe_with_non_json" = 'survey_type_id'
-                            OR "shortened_key_dupe_with_non_json" = 'user_id'
-                            OR "shortened_key_dupe_with_non_json" = 'xform_id'
-                            OR "shortened_key_dupe_with_non_json" = 'xml_hash'
-                            OR "shortened_key_dupe_with_non_json" = 'validation_status'
-                            OR "shortened_key_dupe_with_non_json" = 'is_synced_with_mongo'
-                            OR "shortened_key_dupe_with_non_json" = 'posted_to_kpi'
+                        "shortened_key_dupe_with_non_json" = 'id'
+                        OR "shortened_key_dupe_with_non_json" = 'xml'
+                        OR "shortened_key_dupe_with_non_json" = 'date_created'
+                        OR "shortened_key_dupe_with_non_json" = 'date_modified'
+                        OR "shortened_key_dupe_with_non_json" = 'deleted_at'
+                        OR "shortened_key_dupe_with_non_json" = 'status'
+                        OR "shortened_key_dupe_with_non_json" = 'uuid'
+                        OR "shortened_key_dupe_with_non_json" = 'geom'
+                        OR "shortened_key_dupe_with_non_json" = 'survey_type_id'
+                        OR "shortened_key_dupe_with_non_json" = 'user_id'
+                        OR "shortened_key_dupe_with_non_json" = 'xform_id'
+                        OR "shortened_key_dupe_with_non_json" = 'xml_hash'
+                        OR "shortened_key_dupe_with_non_json" = 'validation_status'
+                        OR "shortened_key_dupe_with_non_json" = 'is_synced_with_mongo'
+                        OR "shortened_key_dupe_with_non_json" = 'posted_to_kpi'
                     )
-                    THEN KEY
+                    THEN
+                        CASE
+                            WHEN (
+                                KEY = 'id'
+                                OR KEY = 'xml'
+                                OR KEY = 'date_created'
+                                OR KEY = 'date_modified'
+                                OR KEY = 'deleted_at'
+                                OR KEY = 'status'
+                                OR KEY = 'uuid'
+                                OR KEY = 'geom'
+                                OR KEY = 'survey_type_id'
+                                OR KEY = 'user_id'
+                                OR KEY = 'xform_id'
+                                OR KEY = 'xml_hash'
+                                OR KEY = 'validation_status'
+                                OR KEY = 'is_synced_with_mongo'
+                                OR KEY = 'posted_to_kpi'
+                            )
+                            THEN CONCAT('json.', KEY)
+                            ELSE KEY
+                        END
                     ELSE "shortened_key_dupe_with_non_json"
                 END AS "shortened_key"
             FROM 
