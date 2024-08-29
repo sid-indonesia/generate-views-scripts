@@ -75,10 +75,10 @@ BEGIN EXECUTE format (
     SELECT
         string_agg(
             format(
-                'generated_views.create_json_flat_view(''public.logger_instance'',''id, xml, date_created, date_modified, deleted_at, status, uuid, geom, survey_type_id, user_id, xform_id, xml_hash, validation_status, is_synced_with_mongo, posted_to_kpi'',''json'',%%1$L,''xform_id'')',
+                'SELECT generated_views.create_json_flat_view(''public.logger_instance'',''id, xml, date_created, date_modified, deleted_at, status, uuid, geom, survey_type_id, user_id, xform_id, xml_hash, validation_status, is_synced_with_mongo, posted_to_kpi'',''json'',%%1$L,''xform_id'')',
                 "identifier_value"
             ),
-            ', '
+            '; '
         )
     FROM
         (
@@ -95,8 +95,7 @@ $ex$
 
 EXECUTE format(
     $ex$
-    SELECT
-        %1$s $ex$,
+    %1$s $ex$,
         the_queries
 );
 
