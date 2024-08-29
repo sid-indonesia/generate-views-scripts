@@ -12,27 +12,54 @@ OR REPLACE FUNCTION generated_views.create_json_flat_view (
 BEGIN EXECUTE format (
     $ex$
     SELECT
-        string_agg(format('%2$s :: jsonb ->>%%1$L "%%2$s"', KEY, "sanitized_key"), ', ')
+        string_agg(format('%2$s :: jsonb ->>%%1$L "%%2$s"', KEY, "shortened_key"), ', ')
     FROM
         (
-            SELECT KEY,
-            CASE
-	            WHEN KEY ILIKE '%%/%%'
-	            THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1))
-	            ELSE KEY
-	        END AS "sanitized_key"
+            SELECT
+                KEY,
+                CASE
+                    WHEN (
+                            "shortened_key_dupe_with_non_json" = 'id'
+                            OR "shortened_key_dupe_with_non_json" = 'xml'
+                            OR "shortened_key_dupe_with_non_json" = 'date_created'
+                            OR "shortened_key_dupe_with_non_json" = 'date_modified'
+                            OR "shortened_key_dupe_with_non_json" = 'deleted_at'
+                            OR "shortened_key_dupe_with_non_json" = 'status'
+                            OR "shortened_key_dupe_with_non_json" = 'uuid'
+                            OR "shortened_key_dupe_with_non_json" = 'geom'
+                            OR "shortened_key_dupe_with_non_json" = 'survey_type_id'
+                            OR "shortened_key_dupe_with_non_json" = 'user_id'
+                            OR "shortened_key_dupe_with_non_json" = 'xform_id'
+                            OR "shortened_key_dupe_with_non_json" = 'xml_hash'
+                            OR "shortened_key_dupe_with_non_json" = 'validation_status'
+                            OR "shortened_key_dupe_with_non_json" = 'is_synced_with_mongo'
+                            OR "shortened_key_dupe_with_non_json" = 'posted_to_kpi'
+                    )
+                    THEN KEY
+                    ELSE "shortened_key_dupe_with_non_json"
+                END AS "shortened_key"
             FROM 
                 (
                     SELECT
-                        DISTINCT KEY
-                    FROM
-                        %1$s li,
-                        jsonb_each(%2$s :: jsonb)
-                    WHERE
-                        li.%4$s = %3$L
-                ) s
-            ORDER BY "sanitized_key"
-        ) t;
+                        KEY,
+                        CASE
+                            WHEN KEY ILIKE '%%/%%'
+                            THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1))
+                            ELSE KEY
+                        END AS "shortened_key_dupe_with_non_json"
+                    FROM 
+                        (
+                            SELECT
+                                DISTINCT KEY
+                            FROM
+                                %1$s li,
+                                jsonb_each(%2$s :: jsonb)
+                            WHERE
+                                li.%4$s = %3$L
+                        ) s
+                ) t
+            ORDER BY "shortened_key"
+        ) u;
 
 $ex$,
 table_name,
