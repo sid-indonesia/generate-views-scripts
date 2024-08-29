@@ -65,7 +65,7 @@ BEGIN EXECUTE format (
                         KEY,
                         CASE
                             WHEN KEY ILIKE '%%/%%'
-                            THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1))
+                            THEN CONCAT('grp/', REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1)))
                             ELSE KEY
                         END AS "shortened_key_dupe_with_non_json"
                     FROM 
