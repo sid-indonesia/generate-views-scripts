@@ -64,8 +64,16 @@ BEGIN EXECUTE format (
                     SELECT
                         KEY,
                         CASE
-                            WHEN KEY ILIKE 'group_%%/%%'
-                            THEN CONCAT('grp/', REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1)))
+                            WHEN KEY ILIKE '%%/%%'
+                            THEN
+                                CASE
+                                    WHEN (
+                                        LENGTH(KEY) > 59
+                                        OR KEY ILIKE 'group_%%/%%'
+                                    )
+                                    THEN CONCAT('grp/', REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1)))
+                                    ELSE KEY
+                                END
                             ELSE KEY
                         END AS "shortened_key_dupe_with_non_json"
                     FROM 
