@@ -70,7 +70,7 @@ BEGIN EXECUTE format (
                                     WHEN (
                                         LENGTH(KEY) > 59
                                     )
-                                    THEN CONCAT('grp/', REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) - 1)))
+                                    THEN REVERSE(SUBSTRING(REVERSE(key), 1, POSITION('/' IN REVERSE(key)) + 9))
                                     ELSE KEY
                                 END
                             ELSE KEY
